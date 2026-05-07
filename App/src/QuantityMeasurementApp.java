@@ -87,12 +87,19 @@ public class QuantityMeasurementApp {
     // Main method
     public static void main(String[] args) {
 
-        boolean feetResult = compareFeet(1.0, 1.0);
+        QuantityLength feet = new QuantityLength(1.0, LengthUnit.FEET);
 
-        // Inches comparison
-        boolean inchResult = compareInches(1.0, 1.0);
+        QuantityLength inch = new QuantityLength(12.0, LengthUnit.INCH);
 
-        System.out.println("Feet Equality : " + feetResult);
-        System.out.println("Inches Equality : " + inchResult);
+        System.out.println(feet.equals(inch));
+
+        QuantityLength inch1 =
+                new QuantityLength(1.0, LengthUnit.INCH);
+
+        QuantityLength inch2 =
+                new QuantityLength(1.0, LengthUnit.INCH);
+
+        System.out.println(inch1.equals(inch2));
+
     }
 }
