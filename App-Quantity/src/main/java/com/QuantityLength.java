@@ -1,7 +1,5 @@
 package com;
 
-
-
 public class QuantityLength {
 
     private static final double EPSILON = 0.0001;
@@ -103,7 +101,8 @@ public class QuantityLength {
                 firstBase + secondBase;
 
         double result =
-                targetUnit.convertFromBaseUnit(totalBase);
+                targetUnit.convertFromBaseUnit(
+                        totalBase);
 
         return new QuantityLength(
                 result,
