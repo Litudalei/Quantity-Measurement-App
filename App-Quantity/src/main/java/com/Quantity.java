@@ -2,14 +2,14 @@ package com;
 
 
 
-public class QuantityLength {
+public class Quantity<U extends IMeasurable> {
 
     private static final double EPSILON = 0.0001;
 
     private final double value;
-    private final LengthUnit unit;
+    private final U unit;
 
-    public QuantityLength(double value, LengthUnit unit) {
+    public Quantity(double value, U unit) {
 
         validateValue(value);
 
@@ -23,7 +23,6 @@ public class QuantityLength {
         this.unit = unit;
     }
 
-    // Validation
     private void validateValue(double value) {
 
         if (!Double.isFinite(value)) {
@@ -33,19 +32,16 @@ public class QuantityLength {
         }
     }
 
-    // Getters
     public double getValue() {
         return value;
     }
 
-    public LengthUnit getUnit() {
+    public U getUnit() {
         return unit;
     }
 
     // Convert to target unit
-    public QuantityLength convertTo(
-            LengthUnit targetUnit
-    ) {
+    public Quantity<U> convertTo(U targetUnit) {
 
         if (targetUnit == null) {
             throw new IllegalArgumentException(
@@ -57,31 +53,33 @@ public class QuantityLength {
                 unit.convertToBaseUnit(value);
 
         double convertedValue =
-                targetUnit.convertFromBaseUnit(baseValue);
+                targetUnit.convertFromBaseUnit(
+                        baseValue
+                );
 
-        return new QuantityLength(
-                convertedValue,
+        return new Quantity<>(
+                round(convertedValue),
                 targetUnit
         );
     }
 
-    // UC6 addition
-    public QuantityLength add(
-            QuantityLength other
+    // Add with default target unit
+    public Quantity<U> add(
+            Quantity<U> other
     ) {
 
         return add(other, this.unit);
     }
 
-    // UC7 addition with explicit target unit
-    public QuantityLength add(
-            QuantityLength other,
-            LengthUnit targetUnit
+    // Add with explicit target unit
+    public Quantity<U> add(
+            Quantity<U> other,
+            U targetUnit
     ) {
 
         if (other == null) {
             throw new IllegalArgumentException(
-                    "Second operand cannot be null"
+                    "Other quantity cannot be null"
             );
         }
 
@@ -103,10 +101,12 @@ public class QuantityLength {
                 firstBase + secondBase;
 
         double result =
-                targetUnit.convertFromBaseUnit(totalBase);
+                targetUnit.convertFromBaseUnit(
+                        totalBase
+                );
 
-        return new QuantityLength(
-                result,
+        return new Quantity<>(
+                round(result),
                 targetUnit
         );
     }
@@ -124,8 +124,14 @@ public class QuantityLength {
             return false;
         }
 
-        QuantityLength other =
-                (QuantityLength) obj;
+        Quantity<?> other =
+                (Quantity<?>) obj;
+
+        // Prevent cross-category comparison
+        if (this.unit.getClass() !=
+                other.unit.getClass()) {
+            return false;
+        }
 
         double thisBase =
                 unit.convertToBaseUnit(value);
@@ -141,12 +147,29 @@ public class QuantityLength {
     }
 
     @Override
+    public int hashCode() {
+
+        double baseValue =
+                unit.convertToBaseUnit(value);
+
+        return Double.hashCode(
+                round(baseValue)
+        );
+    }
+
+    private double round(double value) {
+
+        return Math.round(value * 100.0)
+                / 100.0;
+    }
+
+    @Override
     public String toString() {
 
         return "Quantity(" +
                 value +
                 ", " +
-                unit +
+                unit.getUnitName() +
                 ")";
     }
 }

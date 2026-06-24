@@ -2,7 +2,7 @@ package com;
 
 
 
-public enum LengthUnit {
+public enum LengthUnit implements IMeasurable {
 
     FEET(1.0),
     INCHES(1.0 / 12.0),
@@ -36,13 +36,12 @@ public enum LengthUnit {
         return baseValue / conversionFactor;
     }
 
-    // Validation
-    private void validateValue(double value) {
-
-        if (!Double.isFinite(value)) {
-            throw new IllegalArgumentException(
-                    "Value must be finite"
-            );
-        }
+    public double convertFromBaseUnit(double baseValue) {
+        return baseValue / conversionFactor;
     }
-}
+
+    public String getUnitName() {
+        return name();
+    }
+
+    }
