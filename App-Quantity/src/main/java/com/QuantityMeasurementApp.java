@@ -1,145 +1,32 @@
 package com;
 
+import com.src.main.controller.QuantityMeasurementController;
+import com.src.main.dto.QuantityDTO;
+import com.src.main.repository.IQuantityMeasurementRepository;
+import com.src.main.repository.QuantityMeasurementDatabaseRepository;
+import com.src.main.service.IQuantityMeasurementService;
+import com.src.main.service.QuantityMeasurementServiceImpl;
+import com.src.main.util.DatabaseInitializer;
+
 public class QuantityMeasurementApp {
-
-    public static <U extends IMeasurable>
-    void demonstrateAddition(
-            Quantity<U> first,
-            Quantity<U> second,
-            U targetUnit
-    ) {
-
-        System.out.println(
-                first + ".add(" +
-                        second + ", " +
-                        targetUnit + ") => " +
-                        first.add(
-                                second,
-                                targetUnit
-                        )
-        );
-
-        System.out.println();
-    }
-
-    public static <U extends IMeasurable>
-    void demonstrateSubtraction(
-            Quantity<U> first,
-            Quantity<U> second,
-            U targetUnit
-    ) {
-
-        System.out.println(
-                first + ".subtract(" +
-                        second + ", " +
-                        targetUnit + ") => " +
-                        first.subtract(
-                                second,
-                                targetUnit
-                        )
-        );
-
-        System.out.println();
-    }
-
-    public static <U extends IMeasurable>
-    void demonstrateDivision(
-            Quantity<U> first,
-            Quantity<U> second
-    ) {
-
-        System.out.println(
-                first + ".divide(" +
-                        second + ") => " +
-                        first.divide(second)
-        );
-
-        System.out.println();
-    }
 
     public static void main(String[] args) {
 
-        // Addition
-        demonstrateAddition(
-                new Quantity<>(
-                        1.0,
-                        LengthUnit.FEET
-                ),
-                new Quantity<>(
-                        12.0,
-                        LengthUnit.INCHES
-                ),
-                LengthUnit.FEET
-        );
+        //  Initialize DB
+        DatabaseInitializer.init();
 
-        // Subtraction
-        demonstrateSubtraction(
-                new Quantity<>(
-                        10.0,
-                        LengthUnit.FEET
-                ),
-                new Quantity<>(
-                        6.0,
-                        LengthUnit.INCHES
-                ),
-                LengthUnit.FEET
-        );
+        IQuantityMeasurementRepository repo =
+                new QuantityMeasurementDatabaseRepository();
 
-        // Division
-        demonstrateDivision(
-                new Quantity<>(
-                        24.0,
-                        LengthUnit.INCHES
-                ),
-                new Quantity<>(
-                        2.0,
-                        LengthUnit.FEET
-                )
-        );
+        IQuantityMeasurementService service =
+                new QuantityMeasurementServiceImpl(repo);
 
-        // Weight Example
-        demonstrateAddition(
-                new Quantity<>(
-                        10.0,
-                        WeightUnit.KILOGRAM
-                ),
-                new Quantity<>(
-                        5000.0,
-                        WeightUnit.GRAM
-                ),
-                WeightUnit.GRAM
-        );
+        QuantityMeasurementController controller =
+                new QuantityMeasurementController(service);
 
-        // Volume Example
-        demonstrateSubtraction(
-                new Quantity<>(
-                        5.0,
-                        VolumeUnit.LITRE
-                ),
-                new Quantity<>(
-                        2.0,
-                        VolumeUnit.LITRE
-                ),
-                VolumeUnit.MILLILITRE
+        controller.performComparison(
+                new QuantityDTO(1, "FEET", "LENGTH"),
+                new QuantityDTO(12, "INCHES", "LENGTH")
         );
-
-        System.out.println(
-                new Quantity<>(0.0, TemperatureUnit.CELSIUS)
-                        .equals(new Quantity<>(32.0, TemperatureUnit.FAHRENHEIT))
-        );
-
-        // Conversion
-        System.out.println(
-                new Quantity<>(100.0, TemperatureUnit.CELSIUS)
-                        .convertTo(TemperatureUnit.FAHRENHEIT)
-        );
-
-        // Unsupported Operation
-        try {
-            new Quantity<>(100.0, TemperatureUnit.CELSIUS)
-                    .add(new Quantity<>(50.0, TemperatureUnit.CELSIUS));
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
     }
 }
